@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: custom-atomic-os
+description: My custom atomic Linux distribution powered by BlueBuild
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: 40
+
+modules:
+  - type: files
+    files:
+      - usr: /usr
+
+  - type: rpm-ostree
+    install:
+      - zsh
+      - neofetch
+      - htop
+      - git
+      - curl
+      - tmux
+      - distrobox
+
+  - type: default-flatpaks
+    notify: true
+    system:
+      repo-url: https://dl.flathub.org/repo/flathub.flatpakrepo
+      repo-name: flathub
+      install:
+        - com.mattjakeman.ExtensionManager
+        - org.mozilla.firefox
+        - io.github.celluloid_player.Celluloid
+
+  - type: systemd
+    system:
+      enabled:
+        - sshd
+        - podman.socket
+
+  - type: signing

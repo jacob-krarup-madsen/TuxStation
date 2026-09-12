@@ -1,0 +1,27 @@
+# GNOME Shell extensions
+# Format: extension-name (from extensions.gnome.org or gnome-extensions install)
+# Some are system extensions (Fedora built-in), some need manual install
+
+# System/built-in (installed with Fedora)
+background-logo@fedorahosted.org
+apps-menu@gnome-shell-extensions.gcampax.github.com
+launch-new-instance@gnome-shell-extensions.gcampax.github.com
+places-menu@gnome-shell-extensions.gcampax.github.com
+window-list@gnome-shell-extensions.gcampax.github.com
+
+# User-installed extensions
+dash-to-dock@micxgx.gmail.com
+AlphabeticalAppGrid@stuarthayhurst
+middleclickclose@paolo.tranquilli.gmail.com
+gsconnect@andyholmes.github.io
+scroll-workspaces@gfxmonk.net
+pip-on-top@rafostar.github.com
+quicksettings-audio-devices-hider@marcinjahn.com
+quicksettings-audio-devices-renamer@marcinjahn.com
+appindicatorsupport@rgcjonas.gmail.com
+status-area-horizontal-spacing@mathematical.coffee.gmail.com
+sysmonitor@talhasiddique7
+top-bar-organizer@julian.gse.jsts.xyz
+ok_mixer@enklht.github.io
+fullscreen-avoider@noobsai.github.com
+app-hider@lynith.dev

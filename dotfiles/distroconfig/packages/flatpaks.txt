@@ -1,0 +1,31 @@
+# Flatpak applications
+# Format: application-id
+# Install with: xargs flatpak install -y flathub < packages/flatpaks.txt
+
+app.devsuite.Ptyxis
+com.bitwarden.desktop
+com.discordapp.Discord
+com.github.IsmaelMartinez.teams_for_linux
+com.github.tchx84.Flatseal
+com.heroicgameslauncher.hgl
+com.obsproject.Studio
+com.valvesoftware.Steam
+com.vixalien.sticky
+dev.deedles.Trayscale
+io.ente.auth
+io.github.flattool.Warehouse
+io.github.kolunmi.Bazaar
+io.github.shiftey.Desktop
+io.missioncenter.MissionCenter
+org.freedownloadmanager.Manager
+org.gnome.Calculator
+org.gnome.Calendar
+org.gnome.Evolution
+org.gnome.Loupe
+org.gnome.NautilusPreviewer
+org.gnome.Papers
+org.gnome.Showtime
+org.gnome.TextEditor
+org.onlyoffice.desktopeditors
+org.zotero.Zotero
+page.tesk.Refine

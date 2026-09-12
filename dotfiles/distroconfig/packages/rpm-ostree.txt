@@ -1,0 +1,8 @@
+# rpm-ostree layered packages
+# Install with: sudo rpm-ostree install $(cat packages/rpm-ostree.txt | tr '\n' ' ')
+
+brave-origin
+input-remapper
+libnsl
+tailscale
+xterm

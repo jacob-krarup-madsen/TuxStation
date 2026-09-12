@@ -1,0 +1,4 @@
+# No external dependencies - uses stdlib only
+# Add pinned deps here if needed, e.g.:
+# requests==2.31.0
+

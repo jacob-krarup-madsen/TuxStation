@@ -1,0 +1,61 @@
+name: Build Custom OS Image & ISO
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: custom-atomic-os
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  bluebuild:
+    name: Build Custom Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Custom Image
+        uses: blue-build/github-action@v1
+        with:
+          recipe: config/recipe.yml
+          registry_token: ${{ secrets.GITHUB_TOKEN }}
+          cosign_private_key: ${{ secrets.SIGNING_SECRET }}
+
+  build-iso:
+    name: Build Installer ISO
+    needs: bluebuild
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upgrade crun binary on runner
+        run: |
+          sudo curl -L https://github.com/containers/crun/releases/download/1.20/crun-1.20-linux-amd64 -o /usr/bin/crun
+          sudo chmod +x /usr/bin/crun
+
+      - name: Build ISO using bootc-image-builder Action
+        uses: osbuild/bootc-image-builder-action@v0.0.2
+        with:
+          config-file: ${{ github.workspace }}/config.toml
+          image: ghcr.io/${{ github.repository_owner }}/custom-atomic-os:latest
+          types: iso
+          rootfs: ext4
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: custom-atomic-os-iso
+          path: ./output/**/*.iso

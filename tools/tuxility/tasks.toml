@@ -1,0 +1,180 @@
+# Tuxility task catalog.
+#
+# Each task runs a shell command and can be marked as already done via a
+# `check` command (exit code 0 == done). Tasks are grouped into tabs; edit
+# this file to add your own tasks — the GUI reads it on every launch.
+#
+# Task fields:
+#   id          unique identifier (used for the "done" state file)
+#   name        short title shown in the list
+#   detail      longer description shown under the title
+#   command     shell command to run
+#   sudo        run the command via pkexec (default: false)
+#   check       shell command; exit 0 means the task is already done
+#   reboot      set true if a reboot is needed afterwards
+#   recurring   recurring maintenance action; never stored as permanently done
+#   confirm     optional text that asks for confirmation before running
+
+[[group]]
+name = "System"
+description = "Repositories and base system."
+
+  [[group.item]]
+  id = "flathub"
+  name = "Enable Flathub"
+  detail = "The main Flatpak app store; required by most app installs."
+  command = "flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo"
+  check = "flatpak remotes --columns=name | grep -qx flathub"
+
+  [[group.item]]
+  id = "flathub-only"
+  name = "Make Flathub the only repo"
+  detail = "Removes every other Flatpak remote, keeping just Flathub."
+  command = "for r in $(flatpak remotes --columns=name | grep -v '^flathub$'); do flatpak remote-delete --force \"$r\"; done; flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo"
+  confirm = "This deletes all Flatpak remotes except Flathub. Apps installed from a removed repo may need to be reinstalled."
+  check = "flatpak remotes --columns=name | grep -qx flathub && [ \"$(flatpak remotes --columns=name | grep -vc flathub)\" = 0 ]"
+
+  [[group.item]]
+  id = "codecs"
+  name = "Multimedia codecs"
+  detail = "Layers gstreamer1-plugin-libav for H.264/H.265 video playback."
+  command = "rpm-ostree install --apply-live gstreamer1-plugin-libav"
+  sudo = true
+  check = "rpm -q gstreamer1-plugin-libav >/dev/null 2>&1"
+
+  [[group.item]]
+  id = "distrobox"
+  name = "Install distrobox"
+  detail = "Run other distros in containers; handy for a traditional package manager."
+  command = "rpm-ostree install --apply-live distrobox"
+  sudo = true
+  check = "command -v distrobox >/dev/null"
+
+[[group]]
+name = "Applications"
+description = "Common Flatpak apps, installed per-user from Flathub."
+
+  [[group.item]]
+  id = "gimp"
+  name = "GIMP"
+  detail = "Image editor."
+  command = "flatpak install --user -y flathub org.gimp.GIMP"
+  check = "flatpak info --user org.gimp.GIMP >/dev/null 2>&1"
+
+  [[group.item]]
+  id = "vlc"
+  name = "VLC"
+  detail = "Media player."
+  command = "flatpak install --user -y flathub org.videolan.VLC"
+  check = "flatpak info --user org.videolan.VLC >/dev/null 2>&1"
+
+  [[group.item]]
+  id = "codium"
+  name = "VSCodium"
+  detail = "Free/libre build of VS Code."
+  command = "flatpak install --user -y flathub com.vscodium.codium"
+  check = "flatpak info --user com.vscodium.codium >/dev/null 2>&1"
+
+  [[group.item]]
+  id = "steam"
+  name = "Steam"
+  detail = "Game store and launcher."
+  command = "flatpak install --user -y flathub com.valvesoftware.Steam"
+  check = "flatpak info --user com.valvesoftware.Steam >/dev/null 2>&1"
+
+  [[group.item]]
+  id = "obsidian"
+  name = "Obsidian"
+  detail = "Markdown knowledge base."
+  command = "flatpak install --user -y flathub md.obsidian.Obsidian"
+  check = "flatpak info --user md.obsidian.Obsidian >/dev/null 2>&1"
+
+[[group]]
+name = "Maintenance"
+description = "Recurring upkeep tasks; run them whenever you like."
+
+  [[group.item]]
+  id = "update-system"
+  name = "Update the OS"
+  detail = "Upgrades to the latest Silverblue image."
+  command = "rpm-ostree upgrade"
+  sudo = true
+  reboot = true
+  recurring = true
+  confirm = "Upgrades the whole system to the latest image. A reboot will be needed."
+
+  [[group.item]]
+  id = "update-flatpaks"
+  name = "Update all Flatpak apps"
+  detail = "Updates every installed Flatpak and runtime."
+  command = "flatpak update -y"
+  recurring = true
+
+  [[group.item]]
+  id = "firmware"
+  name = "Update firmware"
+  detail = "Installs pending firmware updates via fwupd."
+  command = "fwupdmgr update"
+  reboot = true
+  recurring = true
+  check = "command -v fwupdmgr >/dev/null"
+
+  [[group.item]]
+  id = "cleanup-flatpaks"
+  name = "Remove unused Flatpak runtimes"
+  detail = "Frees disk by uninstalling runtimes no app uses."
+  command = "flatpak uninstall --unused -y"
+  recurring = true
+
+  [[group.item]]
+  id = "cleanup-deployments"
+  name = "Remove old deployments"
+  detail = "Keeps the two newest images and frees disk space."
+  command = "rpm-ostree cleanup -r"
+  sudo = true
+  recurring = true
+
+  [[group.item]]
+  id = "cleanup-logs"
+  name = "Clean old system logs"
+  detail = "Keeps only the last 30 days of journal entries."
+  command = "journalctl --vacuum-time=30d"
+  sudo = true
+  recurring = true
+
+[[group]]
+name = "Desktop tweaks"
+description = "GNOME settings; ignore if you run a different desktop."
+
+  [[group.item]]
+  id = "clock-weekday"
+  name = "Show weekday in the clock"
+  detail = "Adds the weekday to the top-bar clock."
+  command = "gsettings set org.gnome.desktop.interface clock-show-weekday true"
+  check = "gsettings get org.gnome.desktop.interface clock-show-weekday | grep -q true"
+
+  [[group.item]]
+  id = "window-buttons"
+  name = "Minimize and maximize buttons"
+  detail = "Adds minimize/maximize to the window title bar."
+  command = "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'"
+  check = "gsettings get org.gnome.desktop.wm.preferences button-layout | grep -q minimize,maximize,close"
+
+  [[group.item]]
+  id = "night-light"
+  name = "Enable night light"
+  detail = "Warms screen colors in the evening."
+  command = "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true"
+  check = "gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled | grep -q true"
+
+[[group]]
+name = "Development"
+description = "Toolchains and dev environment."
+
+  [[group.item]]
+  id = "rustup"
+  name = "Install Rust toolchain"
+  detail = "Installs rustup and the stable toolchain to ~/.cargo."
+  command = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+  confirm = "This downloads and installs rustup into your home directory (~/.cargo). Continue?"
+  check = "[ -x \"$HOME/.cargo/bin/rustup\" ]"
